@@ -38,6 +38,13 @@ const addHospital = async (req, res) => {
       return res.json({ success: false, message: "Required data missing" });
     }
 
+    const latitude = parseNumber(lat);
+    const longitude = parseNumber(lng);
+
+    if (latitude === null || longitude === null) {
+      return res.json({ success: false, message: "Invalid coordinates" });
+    }
+
     if (!validator.isEmail(email)) {
       return res.json({ success: false, message: "Invalid email address" });
     }
@@ -55,10 +62,10 @@ const addHospital = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const latitude = parseNumber(lat);
-    const longitude = parseNumber(lng);
+    const latitudeVal = parseNumber(latitude);
+    const longitudeVal = parseNumber(longitude);
 
-    if (latitude === null || longitude === null) {
+    if (latitudeVal === null || longitudeVal === null) {
       return res.json({ success: false, message: "Invalid coordinates" });
     }
 
