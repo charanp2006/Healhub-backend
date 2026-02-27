@@ -12,6 +12,8 @@ A robust Node.js/Express server powering the Healhub healthcare platform with co
 - **Billing System**: Revenue tracking and payment processing
 - **Blog Management**: Article creation and publishing
 - **Analytics**: Comprehensive platform insights
+- **Ratings API**: Endpoints for submitting and aggregating doctor/hospital ratings; appointment schema updated accordingly
+- **Statistics Endpoint**: `/api/user/stats` returns counts of users, doctors, hospitals for frontend display
 - **Authentication**: JWT-based secure authentication
 - **Payment Integration**: Razorpay payment processing
 - **Image Storage**: Cloudinary integration
