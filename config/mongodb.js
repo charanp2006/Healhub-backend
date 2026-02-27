@@ -4,7 +4,7 @@ const connectDB = async () =>{
 
     mongoose.connection.on('connected', () => console.log("Database connected"))
 
-    await mongoose.connect(`${process.env.MONGODB_URI}/hospital`)
+    await mongoose.connect(`${process.env.MONGODB_URI}/healhub`)
 }
 
 export default connectDB;
