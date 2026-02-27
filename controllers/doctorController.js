@@ -264,6 +264,28 @@ const getDoctorBlockedDates = async (req, res) => {
     }
 }
 
+// API to get doctor's schedule for booking (public endpoint)
+const getDoctorScheduleForBooking = async (req, res) => {
+    try {
+        const { docId } = req.params;
+        const doctor = await doctorModel.findById(docId).select('schedule slotDuration blockedDates');
+
+        if (!doctor) {
+            return res.json({ success: false, message: 'Doctor not found' });
+        }
+
+        res.json({ 
+            success: true, 
+            schedule: doctor.schedule || {},
+            slotDuration: doctor.slotDuration || 30,
+            blockedDates: doctor.blockedDates || []
+        });
+    } catch (error) {
+        console.log('Error getting doctor schedule for booking:', error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
 // API to add blocked dates (vacation/leave)
 const addBlockedDates = async (req, res) => {
     try {
@@ -451,6 +473,7 @@ export {
     doctorAnalytics,
     updateDoctorSchedule,
     getDoctorBlockedDates,
+    getDoctorScheduleForBooking,
     addBlockedDates,
     removeBlockedDates
 };

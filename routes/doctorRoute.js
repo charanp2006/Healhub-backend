@@ -12,6 +12,7 @@ import {
     doctorAnalytics,
     updateDoctorSchedule,
     getDoctorBlockedDates,
+    getDoctorScheduleForBooking,
     addBlockedDates,
     removeBlockedDates
 } from "../controllers/doctorController.js";
@@ -46,6 +47,7 @@ doctorRouter.post('/update-profile' , authDoctor , updateDoctorProfile);
 // Routes for availability management
 doctorRouter.post('/update-schedule', authDoctor, updateDoctorSchedule);
 doctorRouter.get('/availability', authDoctor, getDoctorBlockedDates);
+doctorRouter.get('/:docId/schedule', getDoctorScheduleForBooking);
 doctorRouter.post('/block-dates', authDoctor, addBlockedDates);
 doctorRouter.post('/unblock-dates', authDoctor, removeBlockedDates);
 

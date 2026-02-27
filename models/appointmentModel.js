@@ -19,6 +19,10 @@ const appointmentSchema = new mongoose.Schema({
     payment: { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false },
     rescheduled: { type: Boolean, default: false },
+    // rating given by patient after completion
+    rating: { type: Number, min: 1, max: 5 },
+    review: { type: String, default: "" },
+    ratedAt: { type: Number }
 })
 
 const appointmentModel = mongoose.models.appointment || mongoose.model('appointment', appointmentSchema);

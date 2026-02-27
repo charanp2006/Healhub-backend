@@ -15,6 +15,23 @@ const doctorSchema = new mongoose.Schema({
   hospitalId: { type: mongoose.Schema.Types.ObjectId, ref: 'hospital', required: true },
   date: { type: Number, required: true },
   slots_booked: { type: Object, default: {} },
+  // Ratings & reviews
+  reviews: {
+    type: [
+      new mongoose.Schema(
+        {
+          userId: { type: String, ref: 'user' },
+          rating: { type: Number, min: 1, max: 5 },
+          comment: { type: String, default: '' },
+          createdAt: { type: Date, default: Date.now }
+        },
+        { _id: false }
+      )
+    ],
+    default: []
+  },
+  ratingAverage: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
   // Weekly schedule - defines working hours for each day
   schedule: {
     type: Object,

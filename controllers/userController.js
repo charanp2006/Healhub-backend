@@ -4,6 +4,7 @@ import userModel from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 import {v2 as cloudinary} from 'cloudinary';
 import doctorModel from '../models/doctorModel.js';
+import hospitalModel from '../models/hospitalModel.js';
 import appointmentModel from '../models/appointmentModel.js';
 import razorpay from 'razorpay';
 
@@ -199,8 +200,86 @@ const getUserAppointments = async (req, res) => {
         console.log('Error in fetching user appointments:', error);
         res.json({ success: false, message: error.message});
     }
-
 }
+
+// API for rating a completed appointment (doctor + hospital)
+const rateAppointment = async (req, res) => {
+    try {
+        const { userId, appointmentId, rating, review } = req.body;
+        if (!userId || !appointmentId || !rating) {
+            return res.json({ success: false, message: 'Missing required data' });
+        }
+
+        const appointment = await appointmentModel.findById(appointmentId);
+        if (!appointment) {
+            return res.json({ success: false, message: 'Appointment not found' });
+        }
+        if (appointment.userId !== userId) {
+            return res.json({ success: false, message: 'Unauthorized' });
+        }
+        if (!appointment.isCompleted) {
+            return res.json({ success: false, message: 'Cannot rate before completion' });
+        }
+        if (appointment.rating) {
+            return res.json({ success: false, message: 'Appointment already rated' });
+        }
+
+        // update appointment record
+        appointment.rating = rating;
+        appointment.review = review || '';
+        appointment.ratedAt = Date.now();
+        await appointment.save();
+
+        // update doctor ratings
+        const doc = await doctorModel.findById(appointment.docId);
+        if (doc) {
+            const prevCount = doc.ratingCount || 0;
+            const newCount = prevCount + 1;
+            const prevAvg = doc.ratingAverage || 0;
+            const newAvg = (prevAvg * prevCount + rating) / newCount;
+            doc.ratingCount = newCount;
+            doc.ratingAverage = newAvg;
+            doc.reviews.push({ userId, rating, comment: review || '' });
+            await doc.save();
+        }
+
+        // update hospital ratings if appointment had hospital
+        if (appointment.hospitalId) {
+            const hosp = await hospitalModel.findById(appointment.hospitalId);
+            if (hosp) {
+                const prevCount = hosp.ratingCount || 0;
+                const newCount = prevCount + 1;
+                const prevAvg = hosp.ratingAverage || 0;
+                const newAvg = (prevAvg * prevCount + rating) / newCount;
+                hosp.ratingCount = newCount;
+                hosp.ratingAverage = newAvg;
+                hosp.reviews.push({ userId, rating, comment: review || '' });
+                await hosp.save();
+            }
+        }
+
+        res.json({ success: true, message: 'Rating submitted successfully' });
+    } catch (error) {
+        console.log('Error in rateAppointment:', error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// API to return basic stats for homepage carousel
+const getStats = async (req, res) => {
+    try {
+        const userCount = await userModel.countDocuments();
+        const doctorCount = await doctorModel.countDocuments();
+        const hospitalCount = await hospitalModel.countDocuments();
+        res.json({ success: true, userCount, doctorCount, hospitalCount });
+    } catch (error) {
+        console.log('Error in getStats:', error);
+        res.json({ success: false, message: error.message });
+    }
+}
+//     }
+
+// }
 
 // API to cancel user appointment
 const cancelUserAppointment = async (req, res) => {
@@ -359,4 +438,4 @@ const verifyRazorpay = async (req, res) => {
 }
 
 
-export { registerUser, loginUser, getUserProfile, updateUserProfile, bookAppointment, getUserAppointments, cancelUserAppointment, rescheduleAppointment, paymentRazorpay, verifyRazorpay };
+export { registerUser, loginUser, getUserProfile, updateUserProfile, bookAppointment, getUserAppointments, cancelUserAppointment, rescheduleAppointment, paymentRazorpay, verifyRazorpay, rateAppointment, getStats };
