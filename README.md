@@ -18,7 +18,7 @@ A robust Node.js/Express server powering the Healhub healthcare platform with co
 - **Payment Integration**: Razorpay payment processing
 - **Image Storage**: Cloudinary integration
 
-## � Application Flow Diagrams
+## 🔄 Application Flow Diagrams
 
 ### API Request Flow
 
@@ -224,7 +224,7 @@ erDiagram
     }
 ```
 
-## �📋 Prerequisites
+## ✅📋 Prerequisites
 
 - Node.js 14+
 - npm or yarn
